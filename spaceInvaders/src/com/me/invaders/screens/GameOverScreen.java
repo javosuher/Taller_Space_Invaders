@@ -1,23 +1,20 @@
-package com.me.invaders;
+package com.me.invaders.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.me.invaders.spaceInvaders;
 
-public class GameOverScreen implements Screen { // Pantalla que su utilidad es mostrar el GameOver. 
-	private spaceInvaders invaders;
+public class GameOverScreen extends AbstractScreen { // Pantalla que su utilidad es mostrar el GameOver. 
 	private Texture TexturaFondo;
-	private Batch batch;
 	
 	public GameOverScreen(spaceInvaders invaders) {
-		this.invaders = invaders;
-		TexturaFondo = new Texture("data/GameOver.png"); // Fondo
-		TexturaFondo.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-		batch = new SpriteBatch();
+		super(invaders);
+	}
+	
+	@Override
+	public void show() {
+		TexturaFondo = invaders.getManager().get("data/GameOver.png", Texture.class);
 	}
 
 	@Override
@@ -25,7 +22,7 @@ public class GameOverScreen implements Screen { // Pantalla que su utilidad es m
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		batch.begin();
-		batch.draw(TexturaFondo, 0, 0, TexturaFondo.getWidth(), TexturaFondo.getHeight());
+		batch.draw(TexturaFondo, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		batch.end();
 	}
 
@@ -34,35 +31,23 @@ public class GameOverScreen implements Screen { // Pantalla que su utilidad es m
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
-	public void show() {
-		// TODO Auto-generated method stub
-		
-	}
-
 	@Override
 	public void hide() {
 		// TODO Auto-generated method stub
 		
 	}
-
 	@Override
 	public void pause() {
 		// TODO Auto-generated method stub
 		
 	}
-
 	@Override
 	public void resume() {
 		// TODO Auto-generated method stub
 		
 	}
-
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
-		
 	}
-
 }

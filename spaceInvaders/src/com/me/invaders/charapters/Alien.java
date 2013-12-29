@@ -1,14 +1,17 @@
-package com.me.invaders;
+package com.me.invaders.charapters;
 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
-public class alien {
+public class Alien {
 	public final static int IZQUIERDA = 0;
 	public final static int DERECHA = 1;
 	private float SPEED = 1.2f; // Velocidad que se va a ir moviendo el alien.
 	private final float DES_SPEED = 20; // Velocidad de descenso del alien.
 	
+	private Texture texturaAlien;
 	private Vector2 posicion;
 	private float anchura, altura;
 	private Rectangle bordes;
@@ -16,14 +19,19 @@ public class alien {
 	private float margenIzquierdo; // Es el margen izquierdo que no puede pasar el alien.
 	private float margenDerecho; // Es el margen derecho que no puede pasar el alien.
 	
-	public alien(Vector2 posicion, float anchura, float altura, float margenIzquierdo, float margenDerecho) {
+	public Alien(Texture texturaAlien, Vector2 posicion, float margenIzquierdo, float margenDerecho) {
+		this.texturaAlien = texturaAlien;
 		this.posicion = posicion;
-		this.anchura = anchura;
-		this.altura = altura;
+		this.anchura = texturaAlien.getWidth();
+		this.altura = texturaAlien.getHeight();
 		bordes = new Rectangle(posicion.x, posicion.y, anchura, altura);
 		movimiento = DERECHA;
 		this.margenIzquierdo = margenIzquierdo; // Es el margen izquierdo que no puede pasar el alien.
 		this.margenDerecho = margenDerecho; // Es el margen derecho que no puede pasar el alien.
+	}
+	
+	public void draw(SpriteBatch batch) {
+		batch.draw(texturaAlien, posicion.x, posicion.y, anchura, altura);
 	}
 	
 	public void update() {
@@ -50,7 +58,7 @@ public class alien {
 		bordes.y = posicion.y;
 	}
 	
-	public boolean Muerto(shot disparo) {
+	public boolean Muerto(Shot disparo) {
 		return colisiona(bordes, disparo.getBordes());
 	}
 	
