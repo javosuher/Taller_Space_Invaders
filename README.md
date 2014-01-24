@@ -7,4 +7,6 @@ Aqui se recogen los retos que se le van a añadir al juego. En este [documento](
 ####Reto 1: Adaptar el juego a movil
 Realizado.
 ####Reto 2: Añadir un menú y puntuaciones
+Realizado.
+####Reto 3: Persistencia de la puntuación y records
 En curso.
