@@ -135,6 +135,9 @@ public class GameScreen extends AbstractScreen {
 		if(actualizarDisparo)
 			disparo.draw(batch);
 		
+		// Pinta los puntos que se tienen en la pantalla.
+		invaders.getFont().draw(batch, Integer.toString(invaders.getMarcadorDePuntos()), 10, Gdx.graphics.getHeight() - 10);
+		
 		batch.end(); // Terminamos el renderizado.
 		
 		comprobarFinalDelJuego();
@@ -161,6 +164,7 @@ public class GameScreen extends AbstractScreen {
 			aliens.get(i).update();
 			comprobarDerrota(aliens.get(i).getBordes().y); // Comprobamos si los aliens han llegado a la nave para indicar el "GameOver".
 			if(actualizarDisparo && aliens.get(i).Muerto(disparo)) { // Si hay un disparo efectuado y le ha dado al alien
+				invaders.setMarcadorDePuntos(invaders.getMarcadorDePuntos() + 100); // Se aumenta en 100 la puntuación cuando se destruye un alien.
 				aliens.remove(i); // Se destruye el alien!!
 				disparo.alienMuerto(); // Permite quitar el disparo de la pantalla y hace el sonido de explosion
 			}

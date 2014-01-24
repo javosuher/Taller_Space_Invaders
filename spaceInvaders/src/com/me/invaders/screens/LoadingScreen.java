@@ -16,6 +16,7 @@ public class LoadingScreen extends AbstractScreen {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		if(invaders.getManager().update()) { // Si han cargado todas las imagenes
+			invaders.cargarPantallas();
 			invaders.setScreen(invaders.PRINCIPAL);
 		}
 		

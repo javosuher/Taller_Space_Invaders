@@ -4,10 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Texture;
 import com.me.invaders.spaceInvaders;
-import com.sun.corba.se.impl.oa.poa.ActiveObjectMap.Key;
 
 public class WinScreen extends AbstractScreen { // Pantalla que su utilidad es mostrar el YouWin. 
 	private Texture TexturaFondo;
+	private int contador; // Para que no se pueda pulsar desde el principio la pantalla.
 	
 	public WinScreen(spaceInvaders invaders) {
 		super(invaders);
@@ -16,12 +16,19 @@ public class WinScreen extends AbstractScreen { // Pantalla que su utilidad es m
 	@Override
 	public void show() {
 		TexturaFondo = invaders.getManager().get("data/Win.png", Texture.class);
+		contador = 200;
 	}
 
 	@Override
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		
+		if(Gdx.input.isTouched() && contador == 0)
+			invaders.setScreen(invaders.PRINCIPAL); // Te devuelve a la pantalla del menú
+		else if(contador > 0)
+			contador--;
+		
 		batch.begin();
 		batch.draw(TexturaFondo, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		batch.end();

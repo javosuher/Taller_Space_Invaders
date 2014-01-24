@@ -1,14 +1,17 @@
 package com.me.invaders;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.me.invaders.screens.AbstractScreen;
 import com.me.invaders.screens.GameOverScreen;
 import com.me.invaders.screens.GameScreen;
 import com.me.invaders.screens.LoadingScreen;
+import com.me.invaders.screens.MainScreen;
 import com.me.invaders.screens.WinScreen;
 
 /*AplicationListener es una interfaz que proporciona metodos que se llaman cada vez que es necesario
@@ -20,25 +23,28 @@ import com.me.invaders.screens.WinScreen;
  */
 
 public class spaceInvaders extends Game {
-	public AbstractScreen PRINCIPAL, GAMEOVER, WIN, LOADING; // Las pantallas que va a tener el juego
+	public AbstractScreen PRINCIPAL, GAMEOVER, WIN, LOADING, JUEGO; // Las pantallas que va a tener el juego
 	private AssetManager manager; // Permite cargar los recursos.
 	private SpriteBatch batch; // "Grupo de Sprites (imagenes)" nos permite dibujar rectagulos como referencias a texturas, es necesario para mostrar todo por pantalla
+	private BitmapFont font; // Sirve para mostrar los letras y números por la pantalla.
+	private int marcadorDePuntos; // Sirve para contar los puntos al destruir aliens.
 
 	@Override
 	public void create() {
 		manager = new AssetManager();
 		batch = new SpriteBatch(); // Es recomendable solo usar un SpriteBatch en todo el juego
+		this.font = new BitmapFont(Gdx.files.internal("data/arial.fnt"), Gdx.files.internal("data/arial.png"), false);
+		this.marcadorDePuntos = 0; // Los puntos al empezar el juego.
 		
-		// Pantallas del juego
-		PRINCIPAL = new GameScreen(this);
-		GAMEOVER = new GameOverScreen(this);
-		WIN = new WinScreen(this);
+		// Pantallas de carga del juego
 		LOADING = new LoadingScreen(this);
 		
 		// Cargamos todos los elementos externos que usará el juego, como son las texturas y los sonidos.
 		manager.load("data/Loading.png", Texture.class);
 		manager.load("data/Background.png", Texture.class);
 		manager.load("data/GameOver.png", Texture.class);
+		manager.load("data/BotonPlay.png", Texture.class);
+		manager.load("data/BotonExit.png", Texture.class);
 		manager.load("data/Win.png", Texture.class);
 		manager.load("data/alien1.png", Texture.class);
 		manager.load("data/alien2.png", Texture.class);
@@ -52,6 +58,14 @@ public class spaceInvaders extends Game {
 		// Coloca la pantalla actual, se llama desde cualquier pantalla anterior y se llama a Screen.show desde la nueva pantalla
 		setScreen(LOADING);
 	}
+	
+	public void cargarPantallas() {
+		// Se cargan todas las demás pantallas del juego
+		PRINCIPAL = new MainScreen(this);
+		JUEGO = new GameScreen(this);
+		GAMEOVER = new GameOverScreen(this);
+		WIN = new WinScreen(this);
+	}
 
 	public SpriteBatch getBatch() {
 		return batch;
@@ -59,6 +73,18 @@ public class spaceInvaders extends Game {
 	
 	public AssetManager getManager() {
 		return manager;
+	}
+	
+	public BitmapFont getFont() {
+		return font;
+	}
+	
+	public int getMarcadorDePuntos() {
+		return marcadorDePuntos;
+	}
+
+	public void setMarcadorDePuntos(int marcadorDePuntos) {
+		this.marcadorDePuntos = marcadorDePuntos;
 	}
 
 	@Override

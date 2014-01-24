@@ -7,6 +7,7 @@ import com.me.invaders.spaceInvaders;
 
 public class GameOverScreen extends AbstractScreen { // Pantalla que su utilidad es mostrar el GameOver. 
 	private Texture TexturaFondo;
+	private int contador; // Para que no se pueda pulsar desde el principio.
 	
 	public GameOverScreen(spaceInvaders invaders) {
 		super(invaders);
@@ -15,12 +16,19 @@ public class GameOverScreen extends AbstractScreen { // Pantalla que su utilidad
 	@Override
 	public void show() {
 		TexturaFondo = invaders.getManager().get("data/GameOver.png", Texture.class);
+		contador = 200;
 	}
 
 	@Override
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		
+		if(Gdx.input.isTouched() && contador == 0)
+			invaders.setScreen(invaders.PRINCIPAL);  // Te devuelve a la pantalla del menú
+		else if(contador > 0)
+			contador--;
+		
 		batch.begin();
 		batch.draw(TexturaFondo, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		batch.end();
