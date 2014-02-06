@@ -9,4 +9,6 @@ Realizado.
 ####Reto 2: Añadir un menú y puntuaciones
 Realizado.
 ####Reto 3: Persistencia de la puntuación y records
+Realizado.
+####Reto 4: Incrementar la dificultad del juego
 En curso.
