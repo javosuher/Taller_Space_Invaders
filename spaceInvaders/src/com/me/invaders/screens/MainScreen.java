@@ -22,7 +22,8 @@ public class MainScreen extends AbstractScreen {
 		botones = new ArrayList<Boton>();
 		int enMedioDeLaPantalla = Gdx.graphics.getWidth() / 2 - invaders.getManager().get("data/BotonPlay.png", Texture.class).getWidth() / 2;
 		botones.add(new BotonPlay(invaders, new Vector2(enMedioDeLaPantalla, Gdx.graphics.getHeight() / 2 + 50)));
-		botones.add(new BotonExit(invaders, new Vector2(enMedioDeLaPantalla, Gdx.graphics.getHeight() / 2 - 100)));
+		botones.add(new BotonRecords(invaders, new Vector2(enMedioDeLaPantalla, Gdx.graphics.getHeight() / 2 - 60)));
+		botones.add(new BotonExit(invaders, new Vector2(enMedioDeLaPantalla, Gdx.graphics.getHeight() / 2 - 170)));
 	}
 	
 	@Override

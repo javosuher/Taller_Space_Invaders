@@ -2,6 +2,7 @@ package com.me.invaders.screens;
 
 import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
@@ -106,7 +107,9 @@ public class GameScreen extends AbstractScreen {
 		// gl es una variable de tipo GL, nos permite acceder a metodos de GL10, GL11 y GL20
 		//En este caso glClearColor es un bucle (game loop) que establecera el fondo de la pantalla negro (0,0,0) con transparencia 1
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT); // Despues de la funcion anterior es necesario ejecutar esta, para que se lleve a cabo
-
+		
+		volverAlMenu(); // Método que permite volver a atras al menú principal.
+		
 		//Hacemos que se actualizen los parametros de la nave en la pantalla.
 		boolean naveDispara = nave.update(); // Devuelve true si se ha disparado.
 		
@@ -164,7 +167,7 @@ public class GameScreen extends AbstractScreen {
 			aliens.get(i).update();
 			comprobarDerrota(aliens.get(i).getBordes().y); // Comprobamos si los aliens han llegado a la nave para indicar el "GameOver".
 			if(actualizarDisparo && aliens.get(i).Muerto(disparo)) { // Si hay un disparo efectuado y le ha dado al alien
-				invaders.setMarcadorDePuntos(invaders.getMarcadorDePuntos() + 100); // Se aumenta en 100 la puntuación cuando se destruye un alien.
+				invaders.setMarcadorDePuntos(invaders.getMarcadorDePuntos() + 10); // Se aumenta en 10 la puntuación cuando se destruye un alien.
 				aliens.remove(i); // Se destruye el alien!!
 				disparo.alienMuerto(); // Permite quitar el disparo de la pantalla y hace el sonido de explosion
 			}
@@ -177,18 +180,40 @@ public class GameScreen extends AbstractScreen {
 		}
 	}
 	
-	private void comprobarFinalDelJuego() { // Comprueba si se ha acabado el juego
-		if(estanTodosLosAliensDestruidos()) { // Ganaste!!
-			invaders.setScreen(invaders.WIN);
-		}
-		else if(gameOver) { // Perdiste...	
-			invaders.setScreen(invaders.GAMEOVER);
-		}
+	private void volverAlMenu() { // Método privado que tiene los botones para volver al menú durante el juego
+		if(Gdx.input.isKeyPressed(Keys.ESCAPE) || Gdx.input.isKeyPressed(Keys.BACK) || Gdx.input.isKeyPressed(Keys.MENU))
+			invaders.setScreen(invaders.PRINCIPAL);
 	}
 	
 	private boolean estanTodosLosAliensDestruidos() {
 		// Si se han destruido todo los aliens.
 		return (aliensTipo1.isEmpty() && aliensTipo2.isEmpty() && aliensTipo3.isEmpty() && aliensTipo4.isEmpty()); 
+	}
+	
+	private void comprobarFinalDelJuego() { // Comprueba si se ha acabado el juego
+		if(estanTodosLosAliensDestruidos()) { // Ganaste!!
+			guardarRecord();
+			invaders.setScreen(invaders.WIN);
+		}
+		else if(gameOver) { // Perdiste...
+			guardarRecord();
+			invaders.setScreen(invaders.GAMEOVER);
+		}
+	}
+	
+	private void guardarRecord() { // Esta función permite almacenar en el dispositivo la puntuación siempre que sea superior a las 3 mejores
+		if(invaders.getMarcadorDePuntos() > invaders.getPreferencias().getInteger("primerRecord", 0)) { // Si es la mayor puntuación obtenida en el juego.
+			invaders.getPreferencias().putInteger("tercerRecord", invaders.getPreferencias().getInteger("segundoRecord", 0)); // Desplazamos los records a una posición más baja.
+			invaders.getPreferencias().putInteger("segundoRecord", invaders.getPreferencias().getInteger("primerRecord", 0)); // El segundo al tercero, y el primero al segundo.
+			invaders.getPreferencias().putInteger("primerRecord", invaders.getMarcadorDePuntos()); // Introducimos en el primer record el mejor obtenido.
+		}
+		else if(invaders.getMarcadorDePuntos() > invaders.getPreferencias().getInteger("segundoRecord", 0)) {
+			invaders.getPreferencias().putInteger("tercerRecord", invaders.getPreferencias().getInteger("segundoRecord", 0));
+			invaders.getPreferencias().putInteger("segundoRecord", invaders.getMarcadorDePuntos());
+		}
+		else if(invaders.getMarcadorDePuntos() > invaders.getPreferencias().getInteger("tercerRecord", 0))
+			invaders.getPreferencias().putInteger("tercerRecord", invaders.getMarcadorDePuntos());
+		invaders.getPreferencias().flush();
 	}
 	
 	private void comprobarDerrota(float numero) { // Si algun alien ha llegado a la nave.

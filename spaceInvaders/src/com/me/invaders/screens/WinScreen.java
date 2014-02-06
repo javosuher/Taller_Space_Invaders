@@ -16,7 +16,7 @@ public class WinScreen extends AbstractScreen { // Pantalla que su utilidad es m
 	@Override
 	public void show() {
 		TexturaFondo = invaders.getManager().get("data/Win.png", Texture.class);
-		contador = 200;
+		contador = 100;
 	}
 
 	@Override

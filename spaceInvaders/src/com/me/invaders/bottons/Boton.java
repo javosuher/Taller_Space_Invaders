@@ -17,6 +17,7 @@ public abstract class Boton {
 	protected float yMinima;
 	protected float xMaxima;
 	protected float yMaxima;
+	protected static int tiempoPulsacion; // Permite que exista tiempo al pulsar distintos botones.
 
 	//Atributos para pintar
 	protected Texture Textura;
@@ -24,6 +25,7 @@ public abstract class Boton {
 	public Boton(spaceInvaders invaders, Vector2 posicion) {
 		this.invaders = invaders;
 		this.posicion = posicion;
+		tiempoPulsacion = 0;
 	}
 	
 	protected void asignarBordes() { // Metodo que permite asignar los bordes del botón para su correcto funcionamiento.
@@ -40,8 +42,12 @@ public abstract class Boton {
 	}
 	
 	public void update() {
-		if(sePulsaElBoton())
+		if(sePulsaElBoton() && tiempoPulsacion == 0) {
+			tiempoPulsacion = 150;
 			funcionamiento();
+		}
+		else if(tiempoPulsacion > 0)
+			tiempoPulsacion--;
 	}
 	private boolean sePulsaElBoton() { // Esta función privada sirve para comprobar si se pulsa el botón.
 		return Gdx.input.isTouched() && Gdx.input.getX() >= xMinima && Gdx.input.getX() <= xMaxima 

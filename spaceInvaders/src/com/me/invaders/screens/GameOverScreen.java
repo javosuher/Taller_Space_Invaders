@@ -16,7 +16,7 @@ public class GameOverScreen extends AbstractScreen { // Pantalla que su utilidad
 	@Override
 	public void show() {
 		TexturaFondo = invaders.getManager().get("data/GameOver.png", Texture.class);
-		contador = 200;
+		contador = 100;
 	}
 
 	@Override

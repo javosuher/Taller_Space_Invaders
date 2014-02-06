@@ -2,6 +2,7 @@ package com.me.invaders;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
@@ -12,6 +13,7 @@ import com.me.invaders.screens.GameOverScreen;
 import com.me.invaders.screens.GameScreen;
 import com.me.invaders.screens.LoadingScreen;
 import com.me.invaders.screens.MainScreen;
+import com.me.invaders.screens.RecordScreen;
 import com.me.invaders.screens.WinScreen;
 
 /*AplicationListener es una interfaz que proporciona metodos que se llaman cada vez que es necesario
@@ -23,11 +25,12 @@ import com.me.invaders.screens.WinScreen;
  */
 
 public class spaceInvaders extends Game {
-	public AbstractScreen PRINCIPAL, GAMEOVER, WIN, LOADING, JUEGO; // Las pantallas que va a tener el juego
+	public AbstractScreen PRINCIPAL, GAMEOVER, WIN, LOADING, JUEGO, RECORDS; // Las pantallas que va a tener el juego
 	private AssetManager manager; // Permite cargar los recursos.
 	private SpriteBatch batch; // "Grupo de Sprites (imagenes)" nos permite dibujar rectagulos como referencias a texturas, es necesario para mostrar todo por pantalla
 	private BitmapFont font; // Sirve para mostrar los letras y números por la pantalla.
 	private int marcadorDePuntos; // Sirve para contar los puntos al destruir aliens.
+	private Preferences preferencias; // Nos permite almacenar datos en el dispositivo.
 
 	@Override
 	public void create() {
@@ -36,6 +39,8 @@ public class spaceInvaders extends Game {
 		this.font = new BitmapFont(Gdx.files.internal("data/arial.fnt"), Gdx.files.internal("data/arial.png"), false);
 		this.marcadorDePuntos = 0; // Los puntos al empezar el juego.
 		
+		preferencias = Gdx.app.getPreferences("-_PreferencesInvaders-Data-_"); // Obtenemos los datos del fichero, o si no está creado, se crea automaticamente
+		
 		// Pantallas de carga del juego
 		LOADING = new LoadingScreen(this);
 		
@@ -43,8 +48,10 @@ public class spaceInvaders extends Game {
 		manager.load("data/Loading.png", Texture.class);
 		manager.load("data/Background.png", Texture.class);
 		manager.load("data/GameOver.png", Texture.class);
+		manager.load("data/Records.png", Texture.class);
 		manager.load("data/BotonPlay.png", Texture.class);
 		manager.load("data/BotonExit.png", Texture.class);
+		manager.load("data/BotonRecords.png", Texture.class);
 		manager.load("data/Win.png", Texture.class);
 		manager.load("data/alien1.png", Texture.class);
 		manager.load("data/alien2.png", Texture.class);
@@ -65,6 +72,7 @@ public class spaceInvaders extends Game {
 		JUEGO = new GameScreen(this);
 		GAMEOVER = new GameOverScreen(this);
 		WIN = new WinScreen(this);
+		RECORDS = new RecordScreen(this);
 	}
 
 	public SpriteBatch getBatch() {
@@ -79,6 +87,10 @@ public class spaceInvaders extends Game {
 		return font;
 	}
 	
+	public Preferences getPreferencias() {
+		return preferencias;
+	}
+
 	public int getMarcadorDePuntos() {
 		return marcadorDePuntos;
 	}
