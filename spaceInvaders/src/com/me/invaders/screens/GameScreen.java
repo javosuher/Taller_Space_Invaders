@@ -1,6 +1,8 @@
 package com.me.invaders.screens;
 
 import java.util.ArrayList;
+import java.util.Random;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL10;
@@ -8,9 +10,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.math.Vector2;
 import com.me.invaders.spaceInvaders;
-import com.me.invaders.charapters.Alien;
-import com.me.invaders.charapters.Ship;
-import com.me.invaders.charapters.Shot;
+import com.me.invaders.charapters.*;
 
 public class GameScreen extends AbstractScreen { 
 	// Implementa la interfaz de Screen, es decir, se comportara con las caracteristicas de una pantalla
@@ -23,6 +23,7 @@ public class GameScreen extends AbstractScreen {
 	private static final float ALTURA = Gdx.graphics.getHeight() - 70; // Distancia en el eje y donde empiezan los aliens.
 	private static final float MARGEN_IZQUIERDO = 50; // Limite de los aliens a la izquierda.
 	private static final float MARGEN_DERECHO = Gdx.graphics.getWidth(); // Limite de los aliens a la derecha.
+	private static final float AUMENTO_DE_VELOCIDAD = 1.5f; // Velocidad que se le van a aumentar a los aliens cuando se pasa cada fase.
 	
 	private Texture TexturaFondo; // Una Texture es una clase que envuelve una textura estandar de OpenGL, se utiliza para imagenes simples.
 	private Texture texturaAlien1, texturaAlien2, texturaAlien3, texturaAlien4; // Textura de los aliens
@@ -33,9 +34,14 @@ public class GameScreen extends AbstractScreen {
 	private ArrayList<Alien> aliensTipo3; // Los aliens tipo3 del juego.
 	private ArrayList<Alien> aliensTipo4; // Los aliens tipo4 del juego.
 	
-	private Shot disparo; // El disparo que matará los aliens.
-	private boolean actualizarDisparo; // Actualiza el disparo.
+	private Shot disparoNave; // El disparo que matará los aliens.
+	private Shot disparoAlien; // El disparo que lanzarán los aliens para destruir la nave.
+	private boolean actualizarDisparoNave; // Actualiza el disparo de la nave.
+	private boolean actualizarDisparoAlien; // Actualiza el disparo de los aliens.
 	private boolean gameOver; // Te indica si has perdido o no.
+	private int marcadorDePuntos; // Sirve para contar los puntos al destruir aliens.
+	private float velocidadAliens; // La velocidad con la que se moveran los aliens. Aumentará a medida que se avance en las distintas fases.
+	private Random aleatorio; // Permite usar números aleatorios
 	
 	public GameScreen(spaceInvaders invaders) {
 		super(invaders);
@@ -57,32 +63,42 @@ public class GameScreen extends AbstractScreen {
 		aliensTipo3 = new ArrayList<Alien>();
 		aliensTipo4 = new ArrayList<Alien>();
 		
+		velocidadAliens = 1.2f; // La velocidad de inicio.
+		
+		crearAliens(); // Crea los aliens en el juego
+		
+		aleatorio = new Random();
+		gameOver = false;
+		marcadorDePuntos = 0; // Los puntos al empezar el juego.
+	}
+	
+	private void crearAliens() { // Crea los aliens.
 		// Creamos los aliens tipo1
 		texturaAlien1 = invaders.getManager().get("data/alien1.png", Texture.class);
 		texturaAlien1.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		float altura = ALTURA; // La altura a la que tienen que estar los aliens en la pantalla.
 		posicionarAliens(aliensTipo1, texturaAlien1, altura);
 		altura = reducirAlturaAliens(texturaAlien1, altura);
-		
+				
 		// Creamos los aliens tipo2
 		texturaAlien2 = invaders.getManager().get("data/alien2.png", Texture.class);
 		texturaAlien2.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		posicionarAliens(aliensTipo2, texturaAlien2, altura);
 		altura = reducirAlturaAliens(texturaAlien2, altura);
-		
+				
 		// Creamos los aliens tipo3
 		texturaAlien3 = invaders.getManager().get("data/alien3.png", Texture.class);
 		texturaAlien3.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		posicionarAliens(aliensTipo3, texturaAlien3, altura);
 		altura = reducirAlturaAliens(texturaAlien3, altura);
-		
+				
 		// Creamos los aliens tipo4
 		texturaAlien4 = invaders.getManager().get("data/alien4.png", Texture.class);
 		texturaAlien4.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		posicionarAliens(aliensTipo4, texturaAlien4, altura);
 		
-		actualizarDisparo = false;
-		gameOver = false;
+		actualizarDisparoNave = false;
+		actualizarDisparoAlien = false;
 	}
 	
 	private void posicionarAliens(ArrayList<Alien> aliens, Texture texturaAlien, float altura) { // Método que sirve para ubicar los aliens en la pantalla
@@ -90,7 +106,7 @@ public class GameScreen extends AbstractScreen {
 		float limiteDerecha = MARGEN_DERECHO - ((texturaAlien.getHeight() + 5) * MAXIMO_ALIENS_FILA); // Sirve para establecer el limite de cada alien por la derecha.
 		float limiteIzquierda = MARGEN_IZQUIERDO; // Sirve para establecer el limite de cada alien por la izquierda.
 		for(int i = 0; i < MAXIMO_ALIENS_FILA ; i++) {
-			aliens.add(new Alien(texturaAlien, new Vector2(distancia, altura), limiteIzquierda, limiteDerecha));
+			aliens.add(new Alien(texturaAlien, new Vector2(distancia, altura), limiteIzquierda, limiteDerecha, velocidadAliens));
 			distancia = distancia + texturaAlien.getHeight() + 5;
 			limiteDerecha = limiteDerecha + texturaAlien.getHeight() + 5;  // Actalizamos los 3 valores para crear el siguiente alien.
 			limiteIzquierda = limiteIzquierda + texturaAlien.getHeight() + 5;
@@ -113,8 +129,9 @@ public class GameScreen extends AbstractScreen {
 		//Hacemos que se actualizen los parametros de la nave en la pantalla.
 		boolean naveDispara = nave.update(); // Devuelve true si se ha disparado.
 		
-		// Se actualizan todos los valores del disparo
-		disparoUpdate(naveDispara);
+		// Se actualizan todos los valores de los distintos tipos de disparos.
+		disparoNaveUpdate(naveDispara);
+		disparoAlienUpdate();
 		
 		//Hacemos que se actualizen los parametros de los aliens de cada tipo
 		aliensUpdate(aliensTipo1);
@@ -134,42 +151,78 @@ public class GameScreen extends AbstractScreen {
 		pintarAliens(aliensTipo3, texturaAlien3);
 		pintarAliens(aliensTipo4, texturaAlien4);
 		
-		//Dibujamos el disparo si hay alguno
-		if(actualizarDisparo)
-			disparo.draw(batch);
+		//Dibujamos los disparo si hay alguno.
+		if(actualizarDisparoNave)
+			disparoNave.draw(batch);
+		if(actualizarDisparoAlien)
+			disparoAlien.draw(batch);
 		
 		// Pinta los puntos que se tienen en la pantalla.
-		invaders.getFont().draw(batch, Integer.toString(invaders.getMarcadorDePuntos()), 10, Gdx.graphics.getHeight() - 10);
+		invaders.getFont().draw(batch, Integer.toString(marcadorDePuntos), 10, Gdx.graphics.getHeight() - 10);
 		
 		batch.end(); // Terminamos el renderizado.
 		
 		comprobarFinalDelJuego();
 	}
 	
-	private void disparoUpdate(boolean naveDispara) {
+	private void disparoNaveUpdate(boolean naveDispara) { // Método que actualiza el disparo de la nave.
 		// Creamos el disparo si se ha realizado
-		if(naveDispara && !actualizarDisparo) {
-			disparo = new Shot(invaders, new Vector2(nave.getPosicion().x + (nave.getAnchura() / 2 - 1), nave.getAltura() + 12));
-			disparo.disparoSonido(); // Sonido del disparo.
-			actualizarDisparo = true; // Esta variable sirve para no hacer un disparo hasta que se termine el actual y para actualizar los parametros del mismo.
+		if(naveDispara && !actualizarDisparoNave) {
+			disparoNave = new ShotShip(invaders, new Vector2(nave.getPosicion().x + (nave.getAnchura() / 2 - 1), nave.getAltura() + 12));
+			disparoNave.disparoSonido(); // Sonido del disparo.
+			actualizarDisparoNave = true; // Esta variable sirve para no hacer un disparo hasta que se termine el actual y para actualizar los parametros del mismo.
 		}
 		//Hacemos que se actualizen los parametros del disparo en la pantalla si hay efectuado uno.
-		if(actualizarDisparo) {
-			disparo.update();
-			if(disparo.getPosicion().y + disparo.getAltura() > LIMITE_DISPARO) { // Cuando llegue al final de la pantalla
-				actualizarDisparo = false;
+		if(actualizarDisparoNave) {
+			disparoNave.update();
+			if(disparoNave.getPosicion().y + disparoNave.getAltura() > LIMITE_DISPARO) { // Cuando llegue al final de la pantalla
+				actualizarDisparoNave = false;
 			}
 		}
+	}
+	private void disparoAlienUpdate() { // Método que actualiza el disparo de los aliens.
+		// Creamos el disparo si se ha realizado
+		if(!actualizarDisparoAlien) {
+			ArrayList<Alien> filaDisparo = filaDeDisparo();
+			int alienAleatorio = aleatorio.nextInt(filaDisparo.size());
+			disparoAlien = new ShotAlien(invaders, new Vector2(filaDisparo.get(alienAleatorio).getPosicion().x + (filaDisparo.get(alienAleatorio).getAnchura() / 2 - 1), filaDisparo.get(alienAleatorio).getPosicion().y - 5));
+			disparoAlien.disparoSonido(); // Sonido del disparo.
+			actualizarDisparoAlien = true; // Esta variable sirve para no hacer un disparo hasta que se termine el actual y para actualizar los parametros del mismo.
+		}
+		//Hacemos que se actualizen los parametros del disparo en la pantalla si hay efectuado uno.
+		if(actualizarDisparoAlien) {
+			disparoAlien.update();
+			if(nave.tocadoPorDisparo(disparoAlien)) { // Si el disparo toca la nave, pues muere...
+				disparoAlien.naveMuerta();
+				gameOver = true;
+			}
+			else if(disparoAlien.getPosicion().y < 0) { // Cuando llegue al final de la pantalla
+				actualizarDisparoAlien = false;
+			}
+		}
+	}
+	
+	private ArrayList<Alien> filaDeDisparo() { // Permite comprobar la fila mas en el sur de la pantalla para disparar. Dispara por fila siempre y cuando existan aliens en la misma
+		if(aliensTipo4.isEmpty()) {
+			if(aliensTipo3.isEmpty()) {
+				if(aliensTipo2.isEmpty()) {
+					return aliensTipo1;
+				}
+				else return aliensTipo2;
+			}
+			else return aliensTipo3;
+		}
+		else return aliensTipo4;
 	}
 	
 	private void aliensUpdate(ArrayList<Alien> aliens) { // Esta función permite controlar los eventos que puedan pasarles a los aliens
 		for(int i = 0; i < aliens.size(); i++) {
 			aliens.get(i).update();
 			comprobarDerrota(aliens.get(i).getBordes().y); // Comprobamos si los aliens han llegado a la nave para indicar el "GameOver".
-			if(actualizarDisparo && aliens.get(i).Muerto(disparo)) { // Si hay un disparo efectuado y le ha dado al alien
-				invaders.setMarcadorDePuntos(invaders.getMarcadorDePuntos() + 10); // Se aumenta en 10 la puntuación cuando se destruye un alien.
+			if(actualizarDisparoNave && aliens.get(i).Muerto(disparoNave)) { // Si hay un disparo efectuado y le ha dado al alien
+				marcadorDePuntos += 10; // Se aumenta en 10 la puntuación cuando se destruye un alien.
 				aliens.remove(i); // Se destruye el alien!!
-				disparo.alienMuerto(); // Permite quitar el disparo de la pantalla y hace el sonido de explosion
+				disparoNave.alienMuerto(); // Permite quitar el disparo de la pantalla y hace el sonido de explosion
 			}
 		}
 	}
@@ -192,8 +245,8 @@ public class GameScreen extends AbstractScreen {
 	
 	private void comprobarFinalDelJuego() { // Comprueba si se ha acabado el juego
 		if(estanTodosLosAliensDestruidos()) { // Ganaste!!
-			guardarRecord();
-			invaders.setScreen(invaders.WIN);
+			velocidadAliens *= AUMENTO_DE_VELOCIDAD; // Si se destruyen todos los aliens, se aumenta la velocidad.
+			crearAliens(); // Crear de nuevo con mas velocidad y se sigue jugando.
 		}
 		else if(gameOver) { // Perdiste...
 			guardarRecord();
@@ -202,17 +255,17 @@ public class GameScreen extends AbstractScreen {
 	}
 	
 	private void guardarRecord() { // Esta función permite almacenar en el dispositivo la puntuación siempre que sea superior a las 3 mejores
-		if(invaders.getMarcadorDePuntos() > invaders.getPreferencias().getInteger("primerRecord", 0)) { // Si es la mayor puntuación obtenida en el juego.
+		if(marcadorDePuntos > invaders.getPreferencias().getInteger("primerRecord", 0)) { // Si es la mayor puntuación obtenida en el juego.
 			invaders.getPreferencias().putInteger("tercerRecord", invaders.getPreferencias().getInteger("segundoRecord", 0)); // Desplazamos los records a una posición más baja.
 			invaders.getPreferencias().putInteger("segundoRecord", invaders.getPreferencias().getInteger("primerRecord", 0)); // El segundo al tercero, y el primero al segundo.
-			invaders.getPreferencias().putInteger("primerRecord", invaders.getMarcadorDePuntos()); // Introducimos en el primer record el mejor obtenido.
+			invaders.getPreferencias().putInteger("primerRecord", marcadorDePuntos); // Introducimos en el primer record el mejor obtenido.
 		}
-		else if(invaders.getMarcadorDePuntos() > invaders.getPreferencias().getInteger("segundoRecord", 0)) {
+		else if(marcadorDePuntos > invaders.getPreferencias().getInteger("segundoRecord", 0)) {
 			invaders.getPreferencias().putInteger("tercerRecord", invaders.getPreferencias().getInteger("segundoRecord", 0));
-			invaders.getPreferencias().putInteger("segundoRecord", invaders.getMarcadorDePuntos());
+			invaders.getPreferencias().putInteger("segundoRecord", marcadorDePuntos);
 		}
-		else if(invaders.getMarcadorDePuntos() > invaders.getPreferencias().getInteger("tercerRecord", 0))
-			invaders.getPreferencias().putInteger("tercerRecord", invaders.getMarcadorDePuntos());
+		else if(marcadorDePuntos > invaders.getPreferencias().getInteger("tercerRecord", 0))
+			invaders.getPreferencias().putInteger("tercerRecord", marcadorDePuntos);
 		invaders.getPreferencias().flush();
 	}
 	

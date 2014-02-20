@@ -84,6 +84,14 @@ public class Ship {
 	private boolean NoChoqueBordeIzquierda() { // Permite que la nave no siga avanzando y salirse de la pantalla por la izquierda.
 		return posicion.x > MARGEN_IZQUIERDO;
 	}
+	
+	public boolean tocadoPorDisparo(Shot disparo) {
+		return colisiona(bordes, disparo.getBordes());
+	}
+	
+	private boolean colisiona(Rectangle a, Rectangle b) {
+		return a.overlaps(b); // la funcion overlaps nos devuelve verdadero si dos rectangulos se solapan.
+	}
 		
 	// Getters -----------------------------------
 

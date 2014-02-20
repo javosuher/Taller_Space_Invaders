@@ -43,7 +43,7 @@ public class MainScreen extends AbstractScreen {
 
 	@Override
 	public void show() {
-		invaders.setMarcadorDePuntos(0); // Ponemos los puntos a 0;
+		// TODO Auto-generated method stub
 	}
 	@Override
 	public void hide() {

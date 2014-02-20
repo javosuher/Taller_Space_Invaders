@@ -8,35 +8,24 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.me.invaders.spaceInvaders;
 
-public class Shot {
-	private static final float SPEED = 5; // Velocidad del disparo.
-	
-	private Texture texturaShot;
-	private Sound shotSound, explosion;
-	private Vector2 posicion;
-	private float anchura, altura;
-	private Rectangle bordes;
+public abstract class Shot { // Clase abstracta de los disparos
+	protected Texture texturaShot;
+	protected Sound shotSound, explosion;
+	protected Vector2 posicion;
+	protected float anchura, altura;
+	protected Rectangle bordes;
 	
 	public Shot(spaceInvaders invaders, Vector2 posicion) {
-		texturaShot = invaders.getManager().get("data/shot.png", Texture.class);
 		shotSound = invaders.getManager().get("data/shot.wav", Sound.class); // Añade el sonido de los disparos.
 		explosion = invaders.getManager().get("data/explosion.wav", Sound.class); // Añade el sonido de los aliens que mueren
 		this.posicion = posicion;
-		this.anchura = texturaShot.getWidth();
-		this.altura = texturaShot.getHeight();
-		bordes = new Rectangle(posicion.x, posicion.y, anchura, altura);
 	}
 	
 	public void draw(SpriteBatch batch) {
 		batch.draw(texturaShot, posicion.x, posicion.y, anchura, altura);
 	}
 	
-	public void update() {
-		posicion.y = posicion.y + SPEED;
-		
-		// Actualizamos el borde y
-		bordes.y = posicion.y;
-	}
+	public abstract void update(); // Método que implementará cada tipo de disparo.
 	
 	public void disparoSonido() {
 		shotSound.play();
@@ -45,6 +34,9 @@ public class Shot {
 	public void alienMuerto() {
 		posicion.y = Gdx.graphics.getHeight(); // Si se mata al alien enviamos el disparo fuera de la pantalla.
 		explosion.play(); // Sonido de explosion porque ha muerto un alien.
+	}
+	public void naveMuerta() {
+		explosion.play(); // Sonido de explosion porque se ha perdido.
 	}
 	
 	// Getters -----------------------------------
