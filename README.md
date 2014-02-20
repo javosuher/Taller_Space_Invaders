@@ -11,4 +11,6 @@ Realizado.
 ####Reto 3: Persistencia de la puntuación y records
 Realizado.
 ####Reto 4: Incrementar la dificultad del juego
+Realizado.
+####Reto 5: Añadir vidas a la nave
 En curso.
