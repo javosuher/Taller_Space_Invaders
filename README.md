@@ -13,4 +13,6 @@ Realizado.
 ####Reto 4: Incrementar la dificultad del juego
 Realizado.
 ####Reto 5: Añadir vidas a la nave
+Realizado.
+####Reto 6: Agregar mega laser
 En curso.
