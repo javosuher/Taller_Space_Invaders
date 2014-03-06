@@ -35,7 +35,8 @@ public abstract class Shot { // Clase abstracta de los disparos
 		posicion.y = Gdx.graphics.getHeight(); // Si se mata al alien enviamos el disparo fuera de la pantalla.
 		explosion.play(); // Sonido de explosion porque ha muerto un alien.
 	}
-	public void naveMuerta() {
+	public void naveTocada() {
+		posicion.y = -100;
 		explosion.play(); // Sonido de explosion porque se ha perdido.
 	}
 	

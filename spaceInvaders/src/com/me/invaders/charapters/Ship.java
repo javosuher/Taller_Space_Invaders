@@ -92,6 +92,11 @@ public class Ship {
 	private boolean colisiona(Rectangle a, Rectangle b) {
 		return a.overlaps(b); // la funcion overlaps nos devuelve verdadero si dos rectangulos se solapan.
 	}
+	
+	public void volverAPosicionInicial() { // Método que devuelve la nave a su posición inicial.
+		posicion.x = 10;
+		posicion.y = 10;
+	}
 		
 	// Getters -----------------------------------
 
