@@ -15,4 +15,6 @@ Realizado.
 ####Reto 5: Añadir vidas a la nave
 Realizado.
 ####Reto 6: Agregar mega laser
+Realizado.
+####Reto 7: Alien con bonus
 En curso.
