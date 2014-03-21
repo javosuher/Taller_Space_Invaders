@@ -44,6 +44,10 @@ public class GameScreen extends AbstractScreen {
 	private Random aleatorio; // Permite usar números aleatorios
 	private int vidasNave; // Vidas que tendrá nuestra nave.
 	
+	private Ball bola; // Bola que al coger la nave le permite realizar un disparo especial.
+	private Random random; // Permite generar números aleatorios.
+	private boolean megaDisparo; /// Booleando que determina si se puede disparar el mega disparo.
+	
 	public GameScreen(spaceInvaders invaders) {
 		super(invaders);
 	}
@@ -72,6 +76,10 @@ public class GameScreen extends AbstractScreen {
 		gameOver = false;
 		marcadorDePuntos = 0; // Los puntos al empezar el juego.
 		vidasNave = 3; // Ponemos las vidas que tiene que tener la nave.
+		
+		random = new Random(); // Para generar números aleatorios.
+		// Bola que se genera en una parte aleatoria de la pantalla.
+		bola = new Ball(invaders, new Vector2(random.nextInt(Gdx.graphics.getWidth() - invaders.getManager().get("data/bolaBalaEspecial.png", Texture.class).getWidth()), Gdx.graphics.getHeight()));
 	}
 	
 	private void crearAliens() { // Crea los aliens.
@@ -135,6 +143,9 @@ public class GameScreen extends AbstractScreen {
 		disparoNaveUpdate(naveDispara);
 		disparoAlienUpdate();
 		
+		// Actualizamos la bola del mega disparo.
+		bolaUpdate();
+		
 		//Hacemos que se actualizen los parametros de los aliens de cada tipo
 		aliensUpdate(aliensTipo1);
 		aliensUpdate(aliensTipo2);
@@ -146,6 +157,9 @@ public class GameScreen extends AbstractScreen {
 		batch.draw(TexturaFondo, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()); //La dibujamos en la esquina inferior derecha, tamaño natural
 		//Dibujamos nuestra nave
 		nave.draw(batch);
+		
+		//Dibujamos la bola
+		bola.draw(batch);
 		
 		//Dibujamos los aliens
 		pintarAliens(aliensTipo1, texturaAlien1);
@@ -171,19 +185,33 @@ public class GameScreen extends AbstractScreen {
 		comprobarFinalDelJuego();
 	}
 	
+	private void bolaUpdate() { // Actualiza la bola
+		bola.update();
+		if(bola.colisionConNave(nave)) { // Si colisiona con la nave
+			megaDisparo = true; // Se activa el mega disparo
+			bola.setPosicion(random.nextInt(Gdx.graphics.getWidth() - invaders.getManager().get("data/bolaBalaEspecial.png", Texture.class).getWidth()), Gdx.graphics.getHeight());
+		}
+		else if(bola.getPosicion().y < 0 - invaders.getManager().get("data/bolaBalaEspecial.png", Texture.class).getHeight())  // Si se esconde por abajo de la pantalla.
+			bola.setPosicion(random.nextInt(Gdx.graphics.getWidth() - invaders.getManager().get("data/bolaBalaEspecial.png", Texture.class).getWidth()), Gdx.graphics.getHeight());
+	}
+	
 	private void disparoNaveUpdate(boolean naveDispara) { // Método que actualiza el disparo de la nave.
 		// Creamos el disparo si se ha realizado
 		if(naveDispara && !actualizarDisparoNave) {
-			disparoNave = new ShotShip(invaders, new Vector2(nave.getPosicion().x + (nave.getAnchura() / 2 - 1), nave.getAltura() + 12));
+			if(megaDisparo) {
+				disparoNave = new MegaShotShip(invaders, new Vector2(nave.getPosicion().x, nave.getAltura() + 12));
+				megaDisparo = false;
+			}
+			else
+				disparoNave = new ShotShip(invaders, new Vector2(nave.getPosicion().x + (nave.getAnchura() / 2 - 1), nave.getAltura() + 12));
 			disparoNave.disparoSonido(); // Sonido del disparo.
 			actualizarDisparoNave = true; // Esta variable sirve para no hacer un disparo hasta que se termine el actual y para actualizar los parametros del mismo.
 		}
 		//Hacemos que se actualizen los parametros del disparo en la pantalla si hay efectuado uno.
 		if(actualizarDisparoNave) {
 			disparoNave.update();
-			if(disparoNave.getPosicion().y + disparoNave.getAltura() > LIMITE_DISPARO) { // Cuando llegue al final de la pantalla
+			if(disparoNave.getPosicion().y + disparoNave.getAltura() > LIMITE_DISPARO)// Cuando llegue al final de la pantalla
 				actualizarDisparoNave = false;
-			}
 		}
 	}
 	private void disparoAlienUpdate() { // Método que actualiza el disparo de los aliens.

@@ -59,6 +59,8 @@ public class spaceInvaders extends Game {
 		manager.load("data/ship.png", Texture.class);
 		manager.load("data/shot.png", Texture.class);
 		manager.load("data/shotAlien.png", Texture.class);
+		manager.load("data/balaza.png", Texture.class);
+		manager.load("data/bolaBalaEspecial.png", Texture.class);
 		manager.load("data/explosion.wav", Sound.class);
 		manager.load("data/shot.wav", Sound.class);
 		

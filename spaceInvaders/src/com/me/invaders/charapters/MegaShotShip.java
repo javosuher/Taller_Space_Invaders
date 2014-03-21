@@ -1,17 +1,16 @@
 package com.me.invaders.charapters;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.me.invaders.spaceInvaders;
 
-public class ShotShip extends Shot {
-	private static final float SPEED = 5; // Velocidad del disparo.
+public class MegaShotShip extends Shot { // Nuevo disparo especial que es muy grande.
+	private static final float SPEED = 10; // Velocidad del disparo.
 	
-	public ShotShip(spaceInvaders invaders, Vector2 posicion) {
+	public MegaShotShip(spaceInvaders invaders, Vector2 posicion) {
 		super(invaders, posicion);
-		texturaShot = invaders.getManager().get("data/shot.png", Texture.class);
+		texturaShot = invaders.getManager().get("data/balaza.png", Texture.class);
 		this.anchura = texturaShot.getWidth();
 		this.altura = texturaShot.getHeight();
 		bordes = new Rectangle(posicion.x, posicion.y, anchura, altura);
@@ -25,7 +24,6 @@ public class ShotShip extends Shot {
 	}
 	
 	public void alienMuerto() {
-		posicion.y = Gdx.graphics.getHeight(); // Si se mata al alien enviamos el disparo fuera de la pantalla.
 		explosion.play(); // Sonido de explosion porque ha muerto un alien.
 	}
 }

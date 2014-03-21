@@ -22,4 +22,6 @@ public class ShotAlien extends Shot {
 		// Actualizamos el borde y
 		bordes.y = posicion.y;
 	}
+	
+	public void alienMuerto() {	}
 }

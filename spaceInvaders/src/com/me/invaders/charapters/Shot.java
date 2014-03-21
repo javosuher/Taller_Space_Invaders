@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.me.invaders.spaceInvaders;
 
 public abstract class Shot { // Clase abstracta de los disparos
+	protected spaceInvaders invaders;
 	protected Texture texturaShot;
 	protected Sound shotSound, explosion;
 	protected Vector2 posicion;
@@ -16,6 +17,7 @@ public abstract class Shot { // Clase abstracta de los disparos
 	protected Rectangle bordes;
 	
 	public Shot(spaceInvaders invaders, Vector2 posicion) {
+		this.invaders = invaders;
 		shotSound = invaders.getManager().get("data/shot.wav", Sound.class); // Añade el sonido de los disparos.
 		explosion = invaders.getManager().get("data/explosion.wav", Sound.class); // Añade el sonido de los aliens que mueren
 		this.posicion = posicion;
@@ -31,10 +33,8 @@ public abstract class Shot { // Clase abstracta de los disparos
 		shotSound.play();
 	}
 	
-	public void alienMuerto() {
-		posicion.y = Gdx.graphics.getHeight(); // Si se mata al alien enviamos el disparo fuera de la pantalla.
-		explosion.play(); // Sonido de explosion porque ha muerto un alien.
-	}
+	public abstract void alienMuerto(); // Dependerá del tipo de disparo que sea.
+	
 	public void naveTocada() {
 		posicion.y = -100;
 		explosion.play(); // Sonido de explosion porque se ha perdido.
