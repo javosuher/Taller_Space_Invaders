@@ -10,7 +10,14 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.math.Vector2;
 import com.me.invaders.spaceInvaders;
-import com.me.invaders.charapters.*;
+import com.me.invaders.charapters.Alien;
+import com.me.invaders.charapters.AlienBonus;
+import com.me.invaders.charapters.Ball;
+import com.me.invaders.charapters.MegaShotShip;
+import com.me.invaders.charapters.Ship;
+import com.me.invaders.charapters.Shot;
+import com.me.invaders.charapters.ShotAlien;
+import com.me.invaders.charapters.ShotShip;
 
 public class GameScreen extends AbstractScreen { 
 	// Implementa la interfaz de Screen, es decir, se comportara con las caracteristicas de una pantalla
@@ -23,7 +30,10 @@ public class GameScreen extends AbstractScreen {
 	private static final float ALTURA = Gdx.graphics.getHeight() - 70; // Distancia en el eje y donde empiezan los aliens.
 	private static final float MARGEN_IZQUIERDO = 50; // Limite de los aliens a la izquierda.
 	private static final float MARGEN_DERECHO = Gdx.graphics.getWidth(); // Limite de los aliens a la derecha.
+	private static final float SPEED = 1.2f; // Velocidad del juego cuando se inicia.
 	private static final float AUMENTO_DE_VELOCIDAD = 1.5f; // Velocidad que se le van a aumentar a los aliens cuando se pasa cada fase.
+	private static final float FRECUENCIA_ALIEN_BONUS = 4; // Frecuencia con la que sale el alienBonus
+	
 	
 	private Texture TexturaFondo; // Una Texture es una clase que envuelve una textura estandar de OpenGL, se utiliza para imagenes simples.
 	private Texture texturaAlien1, texturaAlien2, texturaAlien3, texturaAlien4; // Textura de los aliens
@@ -46,7 +56,10 @@ public class GameScreen extends AbstractScreen {
 	
 	private Ball bola; // Bola que al coger la nave le permite realizar un disparo especial.
 	private Random random; // Permite generar números aleatorios.
-	private boolean megaDisparo; /// Booleando que determina si se puede disparar el mega disparo.
+	private boolean megaDisparo; /// Booleano que determina si se puede disparar el mega disparo.
+	
+	private boolean naveBonus; // Booleano que indica si hay una nave bonus en juego
+	private AlienBonus alienBonus; // Nuestro objeto que va a ser la nave alien bonus.
 	
 	public GameScreen(spaceInvaders invaders) {
 		super(invaders);
@@ -68,7 +81,7 @@ public class GameScreen extends AbstractScreen {
 		aliensTipo3 = new ArrayList<Alien>();
 		aliensTipo4 = new ArrayList<Alien>();
 		
-		velocidadAliens = 1.2f; // La velocidad de inicio.
+		velocidadAliens = SPEED; // La velocidad de inicio.
 		
 		crearAliens(); // Crea los aliens en el juego
 		
@@ -80,6 +93,8 @@ public class GameScreen extends AbstractScreen {
 		random = new Random(); // Para generar números aleatorios.
 		// Bola que se genera en una parte aleatoria de la pantalla.
 		bola = new Ball(invaders, new Vector2(random.nextInt(Gdx.graphics.getWidth() - invaders.getManager().get("data/bolaBalaEspecial.png", Texture.class).getWidth()), Gdx.graphics.getHeight()));
+		
+		naveBonus = false;
 	}
 	
 	private void crearAliens() { // Crea los aliens.
@@ -146,11 +161,14 @@ public class GameScreen extends AbstractScreen {
 		// Actualizamos la bola del mega disparo.
 		bolaUpdate();
 		
-		//Hacemos que se actualizen los parametros de los aliens de cada tipo
+		// Hacemos que se actualizen los parametros de los aliens de cada tipo
 		aliensUpdate(aliensTipo1);
 		aliensUpdate(aliensTipo2);
 		aliensUpdate(aliensTipo3);
 		aliensUpdate(aliensTipo4);
+		
+		// Se actializa el alien bonus
+		alienBonusUpdate();
 		
 		batch.begin(); // Aqui por fin comenzamos el renderizado
 		//Dibujamos el fondo
@@ -166,6 +184,10 @@ public class GameScreen extends AbstractScreen {
 		pintarAliens(aliensTipo2, texturaAlien2);
 		pintarAliens(aliensTipo3, texturaAlien3);
 		pintarAliens(aliensTipo4, texturaAlien4);
+		
+		//Dibujamos el alien bonus
+		if(naveBonus)
+			alienBonus.draw(batch);
 		
 		//Dibujamos los disparo si hay alguno.
 		if(actualizarDisparoNave)
@@ -262,6 +284,39 @@ public class GameScreen extends AbstractScreen {
 				disparoNave.alienMuerto(); // Permite quitar el disparo de la pantalla y hace el sonido de explosion
 			}
 		}
+	}
+	
+	private void alienBonusUpdate() { // Método que permite actualizar los aliens
+		if(naveBonus) { // Si existe alien bonus
+			alienBonus.update();
+			if(actualizarDisparoNave && alienBonus.Muerto(disparoNave)) { // Si hay un disparo efectuado y le ha dado al alien bonus
+				marcadorDePuntos += 100; // Se aumenta la puntuación de forma considerable
+				naveBonus = false;
+				disparoNave.alienMuerto(); // Permite quitar el disparo de la pantalla y hace el sonido de explosion
+			}
+			else if(alienBonus.getPosicion().x > Gdx.graphics.getWidth()) // Si ha pasado del límite de la pantalla se quita.
+				naveBonus = false;
+		}
+		float valorDeFrecuencia = -1;
+		if(aliensTipo1.isEmpty())
+			if(aliensTipo2.isEmpty())
+				if(aliensTipo3.isEmpty())
+					if(aliensTipo4.isEmpty())
+						valorDeFrecuencia = -1; // Valor que nunca va a tomar la operación.
+					else
+						valorDeFrecuencia = aliensTipo4.get(0).getContadorDeBajadas() % FRECUENCIA_ALIEN_BONUS;
+				else
+					valorDeFrecuencia = aliensTipo3.get(0).getContadorDeBajadas() % FRECUENCIA_ALIEN_BONUS;
+			else
+				valorDeFrecuencia = aliensTipo2.get(0).getContadorDeBajadas() % FRECUENCIA_ALIEN_BONUS;
+		else
+			valorDeFrecuencia = aliensTipo1.get(0).getContadorDeBajadas() % FRECUENCIA_ALIEN_BONUS;
+						
+		if(!naveBonus && valorDeFrecuencia == 0 && aliensTipo1.get(0).getContadorDeBajadas() != 0) { // Si no existe un alien bonus y las bajadas de los aliens entre la frecuencia da como resto 0
+			naveBonus = true;
+			alienBonus = new AlienBonus(invaders, new Vector2(-invaders.getManager().get("data/naveAlienBonus.png", Texture.class).getWidth(), Gdx.graphics.getHeight() - invaders.getManager().get("data/naveAlienBonus.png", Texture.class).getHeight()), velocidadAliens);
+		}
+		
 	}
 	
 	private void pintarAliens(ArrayList<Alien> aliens, Texture texturaAlien) { // Pinta los aliens en la pantalla por cada lista

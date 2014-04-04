@@ -18,6 +18,7 @@ public class Alien {
 	private float margenIzquierdo; // Es el margen izquierdo que no puede pasar el alien.
 	private float margenDerecho; // Es el margen derecho que no puede pasar el alien.
 	private float velocidad; // Velocidad con la que se mueven.
+	private int contadorDeBajadas; // Contador que cuanto cada bajada de los aliens
 	
 	public Alien(Texture texturaAlien, Vector2 posicion, float margenIzquierdo, float margenDerecho, float velocidad) {
 		this.texturaAlien = texturaAlien;
@@ -29,6 +30,7 @@ public class Alien {
 		this.margenIzquierdo = margenIzquierdo; // Es el margen izquierdo que no puede pasar el alien.
 		this.margenDerecho = margenDerecho; // Es el margen derecho que no puede pasar el alien.
 		this.velocidad = velocidad;
+		contadorDeBajadas = 0;
 	}
 	
 	public void draw(SpriteBatch batch) {
@@ -41,6 +43,7 @@ public class Alien {
 			if(posicion.x + anchura > margenDerecho) { // Si el alien esta en el margen derecho.
 				movimiento = IZQUIERDA;
 				posicion.y = posicion.y - DES_SPEED; // Descender
+				contadorDeBajadas += 1; // contaqmos la bajada
 				//SPEED = SPEED * 1.1f; // Aumentamos la velocidad.
 				
 			}
@@ -50,6 +53,7 @@ public class Alien {
 			if(posicion.x < margenIzquierdo) { // Si el alien esta en el margen izquierdo.
 				movimiento = DERECHA;
 				posicion.y = posicion.y - DES_SPEED; // Descender
+				contadorDeBajadas += 1; // contaqmos la bajada
 				//SPEED = SPEED * 1.1f; // Aumentamos la velocidad.
 			}
 		}
@@ -71,6 +75,10 @@ public class Alien {
 
 	public Vector2 getPosicion() {
 		return posicion;
+	}
+
+	public int getContadorDeBajadas() {
+		return contadorDeBajadas;
 	}
 
 	public float getAnchura() {
