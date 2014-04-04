@@ -13,5 +13,8 @@ Aqui se recogen los retos que se le han añadido al juego, con sus respectivos c
   * [Reto 6: Agregar mega laser](https://github.com/javosuher/Taller_Space_Invaders/commit/b2c182a295acaadb922e310a69a6d2f91f474aa8)
   * [Reto 7: Alien con bonus](https://github.com/javosuher/Taller_Space_Invaders/commit/8be30ed1e18b93e4adba1a0cfd5a51766c5ea86a)
 
+##Cartel
+![logo](http://talleradvuca.files.wordpress.com/2014/02/cartelfinalizado.png)
+
 ##Agradecimientos
 Financiado por la Actuación Avalada EL DESARROLLO DE VIDEOJUEGOS COMO REFUERZO DE CONOCIMIENTOS DE  PROGRAMACIÓN: UNA EXPERIENCIA CON TECNOLOGÍAS MÓVILES (código AAA_14_024) de la convocatoria 2013/14 de la Universidad de Cádiz
