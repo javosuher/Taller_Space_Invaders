@@ -1,8 +1,8 @@
 #Taller Space Invaders
 
-Material y código del taller de “Taller de desarrollo de videojuegos de java y libGDX” de la universidad de Cádiz.
+Material y código del taller de “Taller de desarrollo de videojuegos de java y libGDX” de la universidad de Cádiz, realizado el 28 de Noviembre del 2013. Para más información mirar el [blog](http://talleradvuca.wordpress.com/talleres/space-invaders-con-java-y-libgdx/).
 
-##Retos (Realizado)
+##Retos (Finalizado)
 Aqui se recogen los retos que se le han añadido al juego, con sus respectivos commits para poder ver los cambios que se han realizado en el código. En este [documento](https://docs.google.com/document/d/1JfyJMmoTZ06J5j1Kdn8L5CMB9LH2MgFGD_LmzAplUhQ/edit?usp=sharing) se puede ver mas detallado en que consiste cada uno.
 
   * [Reto 1: Adaptar el juego a movil](https://github.com/javosuher/Taller_Space_Invaders/commit/8dbe68b05e842b51371e516e88d14c7044cc356e)
